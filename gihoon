@@ -1,0 +1,77 @@
+(function(){
+    $.fn.WordCounter = function() {
+        var result   = {};
+        var inputed  = [];
+        var show_div = arguments[0];
+        var key_code = {
+            65 : 'a', 66 : 'b', 67 : 'c', 68 : 'd', 69 : 'e', 70 : 'f',
+            71 : 'g', 72 : 'h', 73 : 'i', 74 : 'j', 75 : 'k', 76 : 'l',
+            77 : 'm', 78 : 'n', 79 : 'o', 80 : 'p', 81 : 'q', 82 : 'r',
+            83 : 's', 84 : 't', 85 : 'u', 86 : 'v', 87 : 'w', 88 : 'x',
+            89 : 'y', 90 : 'z',
+            48 : '0', 49 : '1', 50 : '2', 51 : '3', 52 : '4', 53 : '5',
+            54 : '6', 55 : '7', 56 : '8', 57 : '9'
+        };
+        
+        var show = function() {
+            $(show_div).empty();
+
+            for ( var prop in result ) {
+                $(show_div).append(prop + ":" + result[prop] + "<br/>");
+            }
+        };
+        
+        var err = "<p class='err'>英文字および数字だけ入力してください。</p>";
+        $(this).after(err);
+        $(".err").hide();
+        
+        this.bind("keyup", function( event ) {
+            var val     = event.keyCode;
+
+            if ( !key_code[val] ) {
+                if ( val == 8 || val == 46) {
+                    $(".err").hide();
+                    if ( inputed.length == 0 )
+                        return;
+                    var all     = inputed;
+                    var deleted = $(this).val().split("");
+                    
+                    for ( var i = 0; i < all.length; i++ ) {
+                        if ( all[i] !== deleted[i] ) {
+                            result[all[i]] -= 1;
+                            if ( result[all[i]] == 0 ) {
+                                result[all[i]];
+                                delete result[all[i]];
+                            }
+                            inputed.splice(i,1);                            
+                            show();
+                            return;
+                        }
+                    }
+                    
+                } else {
+                    if ( val != 37 && val != 38 && val != 39 && val != 40 ) {
+                        $(".err").show();
+                        var temp = $(this).val().split("");
+                        temp.splice(temp.indexOf(String.fromCharCode(val)), 1);
+                        $(this).empty().val(temp.join(""));
+                    }
+                }
+            } else {
+                $(".err").hide();
+                inputed.push(key_code[val]);
+        
+                if ( result[key_code[val]] ) {
+                    result[key_code[val]] += 1;
+                } else {
+                    result[key_code[val]] = 1;
+                }
+                show();
+            }            
+        });
+    };
+})(jQuery);
+
+$(document).ready(function(){
+    $("#in").WordCounter(".result");
+});
